@@ -1,44 +1,24 @@
-local SonoroUI = {}
-SonoroUI.__index = SonoroUI
+local M = {}
 
--- Constructor untuk membuat instance window baru
-function SonoroUI.New(props)
-    local self = setmetatable({}, SonoroUI)
-    self.title = props.title or "Window"
-    self.size = props.size or { 400, 300 }
-    self.flags = props.flags or 0
-    self.isOpen = props.visible ~= false
-    self.onRender = props.OnRender or function() end
-    return self
-end
-
--- Method render utama
-function SonoroUI:Render()
-    if not self.isOpen then return end
-
-    if self.size then
-        ImGui.SetNextWindowSize(self.size[1], self.size[2], ImGui.Cond.FirstUseEver)
-    end
-
-    local visible, open = ImGui.Begin(self.title, self.isOpen, self.flags)
-    self.isOpen = open
-
+function M.RenderWindow(title, callback)
+    local isOpen = true
+    ImGui.SetNextWindowSize(400, 300, ImGui.Cond.FirstUseEver)
+    
+    local visible, open = ImGui.Begin(title, isOpen, 0)
     if visible then
-        if self.onRender then
-            self.onRender(self)
+        if callback then
+            callback()
         end
     end
     ImGui.End()
 end
 
--- Helper komponen di dalam window
-function SonoroUI:Text(text)
+function M.Text(text)
     ImGui.Text(text)
 end
 
-function SonoroUI:Button(label)
+function M.Button(label)
     return ImGui.Button(label)
 end
 
--- Return table utama agar bisa di-load via load(MakeRequest(...))()
-return SonoroUI
+return M
